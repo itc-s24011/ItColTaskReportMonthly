@@ -1,8 +1,8 @@
 <div align="center">
 
-# ItCol Task Report Monthly
+# ItCol 月次作業報告システム
 
-### Enterprise-Grade Time Tracking & Reporting System
+### エンタープライズグレードの時間追跡・レポートシステム
 
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -14,26 +14,26 @@
 
 ---
 
-## TABLE OF CONTENTS
+## 目次
 
-- [OVERVIEW](#overview)
-- [CORE FEATURES](#core-features)
-- [SYSTEM ARCHITECTURE](#system-architecture)
-- [INSTALLATION](#installation)
-- [USAGE](#usage)
-- [DATABASE SCHEMA](#database-schema)
-- [TECHNOLOGY STACK](#technology-stack)
-- [DEVELOPMENT](#development)
+- [概要](#概要)
+- [主要機能](#主要機能)
+- [システムアーキテクチャ](#システムアーキテクチャ)
+- [インストール](#インストール)
+- [使用方法](#使用方法)
+- [データベーススキーマ](#データベーススキーマ)
+- [技術スタック](#技術スタック)
+- [開発情報](#開発情報)
 
 ---
 
-## OVERVIEW
+## 概要
 
-> A comprehensive web application for tracking, aggregating, and reporting project work hours with precision timing and intelligent categorization.
+> プロジェクトの作業時間を精密なタイミングとインテリジェントな分類で追跡、集計、レポートする包括的な Web アプリケーション
 
-Built for IT professionals who demand accurate time tracking and effortless monthly reporting. This system provides real-time task monitoring, automated aggregation by project and category, and professional A4-formatted reports ready for stakeholder presentation.
+正確な時間追跡と楽な月次レポート作成を求める IT プロフェッショナルのために構築されました。このシステムは、リアルタイムのタスク監視、プロジェクトおよびカテゴリ別の自動集計、ステークホルダー向けのプロフェッショナルな A4 フォーマットレポートを提供します。
 
-### APPLICATION FLOW
+### アプリケーションフロー
 
 ```mermaid
 graph TD
@@ -49,7 +49,7 @@ graph TD
     I -->|印刷| J
 ```
 
-### USE CASE DIAGRAM
+### ユースケース図
 
 ```mermaid
 graph LR
@@ -77,9 +77,9 @@ graph LR
 
 ---
 
-## CORE FEATURES
+## 主要機能
 
-### MODULE 1: Task Registration System
+### モジュール 1: タスク登録システム
 
 ```mermaid
 flowchart LR
@@ -170,9 +170,9 @@ graph TD
 
 ---
 
-## SYSTEM ARCHITECTURE
+## システムアーキテクチャ
 
-### ARCHITECTURE OVERVIEW
+### アーキテクチャ概要
 
 ```mermaid
 graph TB
@@ -208,7 +208,7 @@ graph TB
     style H fill:#e8f5e9
 ```
 
-### DIRECTORY STRUCTURE
+### ディレクトリ構造
 
 ```mermaid
 graph TD
@@ -235,21 +235,21 @@ graph TD
 
 ---
 
-## INSTALLATION
+## インストール
 
-### PREREQUISITES
+### 前提条件
 
 ```bash
-# Required
+# 必須
 Python 3.8+
-pip (latest version)
+pip (最新版)
 
-# Optional (Production)
+# オプション（本番環境用）
 PostgreSQL 12+
-Docker (for containerized deployment)
+Docker (コンテナ化デプロイ用)
 ```
 
-### INSTALLATION WORKFLOW
+### インストールワークフロー
 
 ```mermaid
 sequenceDiagram
@@ -269,43 +269,43 @@ sequenceDiagram
     P-->>U: http://127.0.0.1:5000
 ```
 
-#### Step 1: Clone Repository
+#### ステップ 1: リポジトリのクローン
 
 ```bash
 git clone https://github.com/itc-s24011/ItColTaskReportMonthly.git
 cd ItColTaskReportMonthly/ItColTaskReportMonthly/ItColTaskReportMonthly
 ```
 
-#### Step 2: Virtual Environment Setup
+#### ステップ 2: 仮想環境のセットアップ
 
 ```bash
-# Create virtual environment
+# 仮想環境を作成
 python3 -m venv venv
 
-# Activate virtual environment
+# 仮想環境を有効化
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 ```
 
-#### Step 3: Install Dependencies
+#### ステップ 3: 依存関係のインストール
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### Step 4: Launch Application
+#### ステップ 4: アプリケーションの起動
 
 ```bash
-# Development mode with SQLite (default)
+# SQLiteを使用した開発モード（デフォルト）
 python3 app.py
 
-# Production mode with PostgreSQL
+# PostgreSQLを使用した本番モード
 export USE_POSTGRESQL=1  # Linux/Mac
 set USE_POSTGRESQL=1     # Windows
 python3 app.py
 ```
 
-#### Step 5: Access Application
+#### ステップ 5: アプリケーションへのアクセス
 
 ```
 http://127.0.0.1:5000
@@ -313,9 +313,9 @@ http://127.0.0.1:5000
 
 ---
 
-## USAGE
+## 使用方法
 
-### DAILY WORKFLOW
+### 日次ワークフロー
 
 ```mermaid
 journey
@@ -376,9 +376,9 @@ journey
 
 ---
 
-## DATABASE SCHEMA
+## データベーススキーマ
 
-### ENTITY RELATIONSHIP DIAGRAM
+### エンティティ関連図
 
 ```mermaid
 erDiagram
@@ -395,7 +395,7 @@ erDiagram
     }
 ```
 
-### CATEGORY DISTRIBUTION
+### カテゴリ分布
 
 ```mermaid
 pie title カテゴリ分類
@@ -406,23 +406,23 @@ pie title カテゴリ分類
     "その他" : 5
 ```
 
-### TASK TABLE SPECIFICATION
+### TASK テーブル仕様
 
-| Column           | Type         | Nullable | Description                  |
-| ---------------- | ------------ | -------- | ---------------------------- |
-| id               | INTEGER      | NO       | Primary key (auto-increment) |
-| task_name        | VARCHAR(100) | NO       | Project identifier           |
-| category         | VARCHAR(50)  | NO       | Task category                |
-| memo             | VARCHAR(500) | YES      | Optional notes               |
-| created_date     | DATE         | NO       | Creation timestamp           |
-| start_time       | DATETIME     | YES      | Timer start timestamp        |
-| end_time         | DATETIME     | YES      | Timer end timestamp          |
-| duration_seconds | INTEGER      | YES      | Total duration in seconds    |
-| is_running       | BOOLEAN      | NO       | Timer active flag            |
+| カラム名         | 型           | NULL 許可 | 説明                       |
+| ---------------- | ------------ | --------- | -------------------------- |
+| id               | INTEGER      | NO        | 主キー（自動採番）         |
+| task_name        | VARCHAR(100) | NO        | プロジェクト識別子         |
+| category         | VARCHAR(50)  | NO        | タスクカテゴリ             |
+| memo             | VARCHAR(500) | YES       | オプションメモ             |
+| created_date     | DATE         | NO        | 作成タイムスタンプ         |
+| start_time       | DATETIME     | YES       | タイマー開始タイムスタンプ |
+| end_time         | DATETIME     | YES       | タイマー終了タイムスタンプ |
+| duration_seconds | INTEGER      | YES       | 総継続時間（秒）           |
+| is_running       | BOOLEAN      | NO        | タイマー稼働フラグ         |
 
 ---
 
-## TECHNOLOGY STACK
+## 技術スタック
 
 ```mermaid
 graph LR
@@ -457,23 +457,23 @@ graph LR
     style H fill:#81c784
 ```
 
-### STACK COMPONENTS
+### スタックコンポーネント
 
-| Layer                  | Technology                   | Version |
-| ---------------------- | ---------------------------- | ------- |
-| **Language**           | Python                       | 3.8+    |
-| **Web Framework**      | Flask                        | 3.1.2   |
-| **ORM**                | SQLAlchemy                   | 2.0+    |
-| **Database**           | SQLite / PostgreSQL          | 12+     |
-| **Frontend**           | HTML5, CSS3, JavaScript ES6+ | -       |
-| **Database Driver**    | psycopg2-binary              | 2.9+    |
-| **Session Management** | Flask-SQLAlchemy             | 3.1+    |
+| レイヤー                 | 技術                         | バージョン |
+| ------------------------ | ---------------------------- | ---------- |
+| **言語**                 | Python                       | 3.8+       |
+| **Web フレームワーク**   | Flask                        | 3.1.2      |
+| **ORM**                  | SQLAlchemy                   | 2.0+       |
+| **データベース**         | SQLite / PostgreSQL          | 12+        |
+| **フロントエンド**       | HTML5, CSS3, JavaScript ES6+ | -          |
+| **データベースドライバ** | psycopg2-binary              | 2.9+       |
+| **セッション管理**       | Flask-SQLAlchemy             | 3.1+       |
 
 ---
 
-## DESIGN SYSTEM
+## デザインシステム
 
-### COLOR PALETTE
+### カラーパレット
 
 ```mermaid
 graph LR
@@ -499,9 +499,9 @@ graph LR
 
 ---
 
-## TROUBLESHOOTING
+## トラブルシューティング
 
-### COMMON ISSUES & SOLUTIONS
+### よくある問題と解決策
 
 ```mermaid
 graph TD
@@ -523,45 +523,45 @@ graph TD
     style F fill:#c8e6c9
 ```
 
-**Issue: Flask fails to start**
+**問題: Flask が起動しない**
 
 ```bash
-# Rebuild virtual environment
+# 仮想環境を再構築
 rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Issue: Database corruption or reset needed**
+**問題: データベースの破損またはリセットが必要**
 
 ```bash
-# Remove existing database
+# 既存のデータベースを削除
 rm -f instance/db.sqlite
-python3 app.py  # Auto-recreates on startup
+python3 app.py  # 起動時に自動的に再作成
 ```
 
-**Issue: Port 5000 already in use**
+**問題: ポート 5000 が既に使用中**
 
 ```python
-# Edit app.py - change port number
+# app.pyを編集 - ポート番号を変更
 app.run(debug=True, port=5001)
 ```
 
 ---
 
-## DEVELOPMENT
+## 開発情報
 
-### PROJECT METRICS
+### プロジェクトメトリクス
 
 ```
-Team Size:     6 developers
-Timeline:      9 hours (single day sprint)
-Total Effort:  54 person-hours
-Methodology:   Agile development with rapid prototyping
+チームサイズ:   6名の開発者
+期間:          9時間（1日スプリント）
+総工数:        54人時
+方法論:        ラピッドプロトタイピングを伴うアジャイル開発
 ```
 
-### DEVELOPMENT TIMELINE
+### 開発タイムライン
 
 ```mermaid
 gantt
@@ -584,36 +584,36 @@ gantt
 
 ---
 
-## LICENSE
+## ライセンス
 
-This project is created for educational purposes.
+このプロジェクトは教育目的で作成されています。
 
-## CONTRIBUTING
+## コントリビューション
 
-Bug reports and feature requests are welcome via GitHub Issues.
+バグ報告や機能リクエストは、GitHub Issues で歓迎します。
 
-## SUPPORT
+## サポート
 
-For assistance, please refer to:
+サポートが必要な場合は、以下を参照してください:
 
-1. [Troubleshooting Guide](#troubleshooting)
+1. [トラブルシューティングガイド](#トラブルシューティング)
 2. [GitHub Issues](https://github.com/itc-s24011/ItColTaskReportMonthly/issues)
-3. Development team contact
+3. 開発チームへの連絡
 
 ---
 
 <div align="center">
 
-### PROJECT INFORMATION
+### プロジェクト情報
 
-**Created:** December 15, 2025  
-**Last Updated:** January 19, 2026  
-**Version:** 1.1.0
+**作成日:** 2025 年 12 月 15 日  
+**最終更新:** 2026 年 1 月 19 日  
+**バージョン:** 1.1.0
 
-**Development Team:** IT Professional Students (6 members)
+**開発チーム:** IT 専門学生（6 名）
 
 ---
 
-_Built with precision. Designed for professionals._
+_精密に構築。プロフェッショナルのために設計。_
 
 </div>

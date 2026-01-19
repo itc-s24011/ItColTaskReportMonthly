@@ -1,31 +1,272 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <title>Todo App</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タスク管理・タイマー - Task Tracker</title>
+    <meta name="description" content="プロジェクト作業時間を計測・管理するツール">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Todo App</h1>
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <h1>Task Tracker</h1>
+            <nav class="nav-tabs" role="navigation" aria-label="メインナビゲーション">
+                <a href="{{ url_for('home') }}" class="nav-tab active" aria-current="page">タスク登録</a>
+                <a href="{{ url_for('report') }}" class="nav-tab">月次レポート</a>
+            </nav>
+        </header>
+
         {% if db_info %}
-        <div class="db-info">
-            <strong>🐘 Database:</strong> {{ db_info.type }} - {{ db_info.database }}@{{ db_info.host }} (User: {{ db_info.user }})
+        <div class="db-info" role="status" aria-live="polite">
+            <strong>Database:</strong> {{ db_info.type }} - {{ db_info.database }}@{{ db_info.host }} (User: {{ db_info.user }})
         </div>
         {% endif %}
-        <form method="POST" action="/add">
-            <input type="text" name="title" id="title" placeholder="Add Todo" required>
-            <button type="submit">Add</button>
-        </form>
-        <ul>
-            {% for todo in todo_list %}
-            <li>
-                {{ todo.title }}
-                <form method="POST" action="/delete/{{ todo.id }}">
-                    <button type="submit">Delete</button>
-                </form>
-            </li>
-            {% endfor %}
-        </ul>
+
+        <!-- 日付と総作業時間 -->
+        <section class="date-summary" aria-labelledby="date-heading">
+            <div class="date-display">
+                <h2 id="date-heading" class="date-label">{{ today.strftime('%Y年%m月%d日') }}</h2>
+            </div>
+            <div class="hours-display">
+                <span class="hours-label">当日の作業時間</span>
+                <strong class="hours-value" aria-label="当日の総作業時間">{{ total_hours }}h</strong>
+            </div>
+        </section>
+
+        <!-- タスク登録フォーム -->
+        <section class="task-form-container" aria-labelledby="form-heading">
+            <h2 id="form-heading">新規タスク登録</h2>
+            <form method="POST" action="{{ url_for('add_task') }}" class="task-form">
+                
+                <!-- プロジェクト名 -->
+                <div class="form-group">
+                    <label for="task_name">プロジェクト名 <span class="required" aria-label="必須">*</span></label>
+                    <input type="text" 
+                           id="task_name" 
+                           name="task_name" 
+                           maxlength="100" 
+                           placeholder="プロジェクト名を入力してください" 
+                           required
+                           aria-required="true">
+                </div>
+
+                <!-- カテゴリ選択 -->
+                <div class="form-group">
+                    <label for="category">カテゴリ <span class="required" aria-label="必須">*</span></label>
+                    <select id="category" name="category" required aria-required="true">
+                        <option value="">選択してください</option>
+                        <option value="開発">開発</option>
+                        <option value="会議">会議</option>
+                        <option value="メール">メール</option>
+                        <option value="調査">調査</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+
+                <!-- メモ -->
+                <div class="form-group">
+                    <label for="memo">メモ</label>
+                    <textarea id="memo" 
+                              name="memo" 
+                              maxlength="500" 
+                              placeholder="作業内容のメモ（任意）" 
+                              rows="3"
+                              aria-describedby="memo-hint"></textarea>
+                    <small id="memo-hint" class="form-hint">最大500文字まで入力できます</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">タスクを追加</button>
+            </form>
+        </section>
+
+        <!-- 今日のタスク一覧 -->
+        <section class="task-list-container" aria-labelledby="task-list-heading">
+            <h2 id="task-list-heading">今日のタスク</h2>
+            
+            {% if tasks %}
+                <ul class="task-list" role="list">
+                {% for task in tasks %}
+                <li class="task-item {% if task.is_running %}task-running{% endif %}" role="article">
+                    <div class="task-header">
+                        <h3 class="task-name">{{ task.task_name }}</h3>
+                        <span class="task-category category-{{ task.category }}" role="status">{{ task.category }}</span>
+                    </div>
+                    
+                    <div class="task-details">
+                        {% if task.memo %}
+                        <p class="task-memo">{{ task.memo }}</p>
+                        {% endif %}
+                        
+                        <div class="task-time">
+                            <span class="duration">
+                                作業時間: 
+                                <time id="duration-{{ task.id }}" datetime="PT{{ task.duration_seconds }}S">
+                                    {{ (task.duration_seconds // 3600)|int }}:{{ '%02d' % ((task.duration_seconds % 3600) // 60) }}:{{ '%02d' % (task.duration_seconds % 60) }}
+                                </time>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="task-actions" role="group" aria-label="タスク操作">
+                        {% if task.is_running %}
+                            <form method="POST" action="{{ url_for('stop_timer', task_id=task.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-stop" aria-label="タイマーを停止">STOP</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('start_timer', task_id=task.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-start" aria-label="タイマーを開始">START</button>
+                            </form>
+                        {% endif %}
+                        
+                        <button class="btn btn-edit" 
+                                data-task-id="{{ task.id }}"
+                                data-task-name="{{ task.task_name }}"
+                                data-category="{{ task.category }}"
+                                data-memo="{{ task.memo or '' }}"
+                                onclick="editTask(this)"
+                                aria-label="タスクを編集">編集</button>
+                        
+                        <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" style="display: inline;" onsubmit="return confirm('このタスクを削除しますか？');">
+                            <button type="submit" class="btn btn-delete" aria-label="タスクを削除">削除</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-tasks" role="status">
+                    <p>今日のタスクはまだありません</p>
+                    <p>上のフォームから新しいタスクを追加してください</p>
+                </div>
+            {% endif %}
+        </section>
     </div>
+
+    <!-- 編集モーダル -->
+    <div id="editModal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <button class="close" onclick="closeEditModal()" aria-label="モーダルを閉じる">&times;</button>
+            <h2 id="modal-title">タスク編集</h2>
+            <form id="editForm" method="POST">
+                <div class="form-group">
+                    <label for="edit_task_name">プロジェクト名</label>
+                    <input type="text" id="edit_task_name" name="task_name" maxlength="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_category">カテゴリ</label>
+                    <select id="edit_category" name="category" required>
+                        <option value="開発">開発</option>
+                        <option value="会議">会議</option>
+                        <option value="メール">メール</option>
+                        <option value="調査">調査</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_memo">メモ</label>
+                    <textarea id="edit_memo" name="memo" maxlength="500" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // タイマーのリアルタイム更新
+        let updateTimerInterval = null;
+
+        function updateTimer() {
+            fetch('/api/timer_status')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.is_running) {
+                        const hours = Math.floor(data.elapsed_seconds / 3600);
+                        const minutes = Math.floor((data.elapsed_seconds % 3600) / 60);
+                        const seconds = data.elapsed_seconds % 60;
+                        const timeStr = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        
+                        const durationElement = document.getElementById(`duration-${data.task_id}`);
+                        if (durationElement) {
+                            durationElement.textContent = timeStr;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Timer update error:', error);
+                });
+        }
+
+        // 1秒ごとにタイマーを更新
+        updateTimerInterval = setInterval(updateTimer, 1000);
+
+        // ページが非表示になったら更新を停止
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (updateTimerInterval) {
+                    clearInterval(updateTimerInterval);
+                }
+            } else {
+                updateTimerInterval = setInterval(updateTimer, 1000);
+            }
+        });
+
+        // 編集モーダル
+        function editTask(button) {
+            const taskId = button.dataset.taskId;
+            const taskName = button.dataset.taskName;
+            const category = button.dataset.category;
+            const memo = button.dataset.memo;
+            
+            const form = document.getElementById('editForm');
+            form.action = `/edit_task/${taskId}`;
+            document.getElementById('edit_task_name').value = taskName;
+            document.getElementById('edit_category').value = category;
+            document.getElementById('edit_memo').value = memo;
+            
+            const modal = document.getElementById('editModal');
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            
+            // モーダル内の最初の入力フィールドにフォーカス
+            document.getElementById('edit_task_name').focus();
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // モーダル外クリックで閉じる
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+
+        // ESCキーでモーダルを閉じる
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('editModal');
+                if (modal.style.display === 'block') {
+                    closeEditModal();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

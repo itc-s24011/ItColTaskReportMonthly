@@ -1,26 +1,39 @@
-# ItCol 月次作業報告ツール
+<div align="center">
 
-プロジェクト作業時間を計測・集計し、月次レポートを作成する Web アプリケーション
+# ItCol Task Report Monthly
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.1.2-green.svg)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/License-Educational-yellow.svg)]()
+### Enterprise-Grade Time Tracking & Reporting System
 
-## 📋 目次
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.1.2-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-Educational-FFA500?style=for-the-badge)]()
 
-- [概要](#概要)
-- [主な機能](#主な機能)
-- [システム構成](#システム構成)
-- [セットアップ](#セットアップ)
-- [使い方](#使い方)
-- [データベース構造](#データベース構造)
-- [技術スタック](#技術スタック)
+</div>
 
-## 🎯 概要
+---
 
-IT 業務における作業実績を日々記録し、月次で集計・報告するための Web アプリケーションです。タスク単位での作業時間の正確な計測と、プロジェクト・カテゴリ別の自動集計により、効率的な作業報告を実現します。
+## TABLE OF CONTENTS
 
-### アプリケーションフロー
+- [OVERVIEW](#overview)
+- [CORE FEATURES](#core-features)
+- [SYSTEM ARCHITECTURE](#system-architecture)
+- [INSTALLATION](#installation)
+- [USAGE](#usage)
+- [DATABASE SCHEMA](#database-schema)
+- [TECHNOLOGY STACK](#technology-stack)
+- [DEVELOPMENT](#development)
+
+---
+
+## OVERVIEW
+
+> A comprehensive web application for tracking, aggregating, and reporting project work hours with precision timing and intelligent categorization.
+
+Built for IT professionals who demand accurate time tracking and effortless monthly reporting. This system provides real-time task monitoring, automated aggregation by project and category, and professional A4-formatted reports ready for stakeholder presentation.
+
+### APPLICATION FLOW
 
 ```mermaid
 graph TD
@@ -36,7 +49,7 @@ graph TD
     I -->|印刷| J
 ```
 
-### ユースケース図
+### USE CASE DIAGRAM
 
 ```mermaid
 graph LR
@@ -62,9 +75,11 @@ graph LR
     UC5 -.->|含む| UC5C[カテゴリ別表示]
 ```
 
-## ✨ 主な機能
+---
 
-### M-1. タスク登録フォーム ✅
+## CORE FEATURES
+
+### MODULE 1: Task Registration System
 
 ```mermaid
 flowchart LR
@@ -78,11 +93,14 @@ flowchart LR
     style D fill:#ffcdd2
 ```
 
-- **プロジェクト名**: 必須入力、最大 100 文字
-- **カテゴリ選択**: プルダウン（開発、会議、メール、調査、その他）
-- **メモ**: 任意入力、最大 500 文字
+**Key Specifications:**
 
-### M-2. タイマー機能 ✅
+- **Project Name**: Required field, max 100 characters
+- **Category Selection**: Dropdown (Development, Meeting, Email, Research, Other)
+- **Memo Field**: Optional, max 500 characters
+- **Validation**: Real-time input validation with user feedback
+
+### MODULE 2: Precision Timer System
 
 ```mermaid
 stateDiagram-v2
@@ -98,11 +116,14 @@ stateDiagram-v2
     end note
 ```
 
-- **START/STOP ボタン**: 作業時間の計測開始・停止
-- **経過時間表示**: リアルタイムで時間表示（hh:mm:ss 形式）
-- **データ記録**: 開始時刻、終了時刻、作業時間（秒単位）を DB に保存
+**Key Specifications:**
 
-### M-3. 月次集計機能 ✅
+- **START/STOP Controls**: Initiate and terminate time tracking with single-click precision
+- **Live Display**: Real-time elapsed time in hh:mm:ss format with 1-second refresh
+- **Data Persistence**: Automatic storage of start time, end time, and duration (in seconds)
+- **State Management**: Maintains timer state across sessions
+
+### MODULE 3: Monthly Aggregation Engine
 
 ```mermaid
 graph TD
@@ -122,27 +143,36 @@ graph TD
     style H fill:#c8e6c9
 ```
 
-- **集計期間選択**: 年月をプルダウンで選択
-- **総作業時間表示**: 選択月の総作業時間（h 単位、小数点 1 桁）
-- **総作業日数表示**: 選択月の実働日数
+**Key Specifications:**
 
-### M-4/M-5. プロジェクト別・カテゴリ別一覧 ✅
+- **Period Selection**: Year and month dropdown selectors with dynamic filtering
+- **Total Hours Display**: Aggregate work hours (decimal format, 1 decimal place)
+- **Working Days Count**: Total active working days in selected period
+- **SQL Optimization**: Efficient GROUP BY and SUM queries for fast aggregation
 
-| 項目       | 説明                                           |
-| ---------- | ---------------------------------------------- |
-| 表示項目   | プロジェクト名/カテゴリ名、作業時間、割合（%） |
-| ソート     | 作業時間の降順                                 |
-| レイアウト | A4 縦印刷対応テーブル                          |
+### MODULE 4/5: Project & Category Analytics
 
-### M-6. 印刷対応（CSS） ✅
+| Feature             | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| **Display Metrics** | Project/Category name, work hours, percentage distribution |
+| **Sorting**         | Descending order by work hours (highest priority first)    |
+| **Layout**          | A4 portrait-optimized table with responsive design         |
+| **Visualization**   | Horizontal bar charts for percentage representation        |
 
-- `@media print` を使用した印刷専用 CSS
-- A4 縦サイズでページ内に収まるレイアウト
-- 不要要素（ボタン、ナビゲーション）を自動非表示
+### MODULE 6: Print-Optimized CSS System
 
-## 🏗️ システム構成
+**Key Specifications:**
 
-### システムアーキテクチャ
+- `@media print` dedicated stylesheet for professional output
+- A4 portrait layout with optimized margins and spacing
+- Automatic removal of interactive elements (buttons, navigation)
+- High-contrast color scheme for clear printed output
+
+---
+
+## SYSTEM ARCHITECTURE
+
+### ARCHITECTURE OVERVIEW
 
 ```mermaid
 graph TB
@@ -178,7 +208,7 @@ graph TB
     style H fill:#e8f5e9
 ```
 
-### ディレクトリ構造
+### DIRECTORY STRUCTURE
 
 ```mermaid
 graph TD
@@ -203,15 +233,23 @@ graph TD
     style G fill:#ffccbc
 ```
 
-## 🚀 セットアップ
+---
 
-### 前提条件
+## INSTALLATION
 
-- Python 3.8 以上
-- pip
-- (オプション) PostgreSQL 12 以上
+### PREREQUISITES
 
-### インストール手順
+```bash
+# Required
+Python 3.8+
+pip (latest version)
+
+# Optional (Production)
+PostgreSQL 12+
+Docker (for containerized deployment)
+```
+
+### INSTALLATION WORKFLOW
 
 ```mermaid
 sequenceDiagram
@@ -231,53 +269,53 @@ sequenceDiagram
     P-->>U: http://127.0.0.1:5000
 ```
 
-### 1. リポジトリのクローン
+#### Step 1: Clone Repository
 
 ```bash
 git clone https://github.com/itc-s24011/ItColTaskReportMonthly.git
 cd ItColTaskReportMonthly/ItColTaskReportMonthly/ItColTaskReportMonthly
 ```
 
-### 2. 仮想環境のセットアップ
+#### Step 2: Virtual Environment Setup
 
 ```bash
-# 仮想環境を作成
+# Create virtual environment
 python3 -m venv venv
 
-# 仮想環境を有効化
+# Activate virtual environment
 source venv/bin/activate  # Linux/Mac
-# または
 venv\Scripts\activate     # Windows
 ```
 
-### 3. 依存パッケージのインストール
+#### Step 3: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. アプリケーションの起動
+#### Step 4: Launch Application
 
 ```bash
-# SQLiteを使用（デフォルト）
+# Development mode with SQLite (default)
 python3 app.py
 
-# PostgreSQLを使用
+# Production mode with PostgreSQL
 export USE_POSTGRESQL=1  # Linux/Mac
-# または
 set USE_POSTGRESQL=1     # Windows
 python3 app.py
 ```
 
-### 5. ブラウザでアクセス
+#### Step 5: Access Application
 
 ```
-http://127.0.0.1:5000
+🌐 http://127.0.0.1:5000
 ```
 
-## 📖 使い方
+---
 
-### タスク登録から報告までの流れ
+## USAGE
+
+### DAILY WORKFLOW
 
 ```mermaid
 journey
@@ -297,44 +335,50 @@ journey
       レポート印刷: 5: ユーザー
 ```
 
-### タスク登録・実行画面
+### TASK REGISTRATION & EXECUTION
 
-1. **新規タスク登録**
+**1. Create New Task**
 
-   - プロジェクト名を入力
-   - カテゴリを選択（開発、会議、メール、調査、その他）
-   - メモを入力（任意）
-   - 「タスクを追加」ボタンをクリック
+- Enter project name (required)
+- Select category from dropdown (Development, Meeting, Email, Research, Other)
+- Add optional memo (max 500 characters)
+- Click "Add Task" button
 
-2. **タイマーの操作**
+**2. Timer Operations**
 
-   - **START**: タスクの作業時間計測を開始
-   - **STOP**: 作業時間計測を停止
-   - 経過時間はリアルタイムで更新されます
+- **START**: Begin time tracking for selected task
+- **STOP**: End time tracking and save duration
+- **Live Updates**: Elapsed time refreshes every second
 
-3. **タスクの編集・削除**
-   - **編集**: タスク情報を変更
-   - **削除**: タスクを削除（確認ダイアログが表示されます）
+**3. Task Management**
 
-### 月次レポート画面
+- **Edit**: Modify task information in-place
+- **Delete**: Remove task with confirmation dialog
 
-1. **期間選択**
+### MONTHLY REPORT GENERATION
 
-   - 年と月をプルダウンから選択
-   - 自動的に集計結果が更新されます
+**1. Period Selection**
 
-2. **表示切替**
+- Choose year and month from dropdowns
+- Results update automatically on selection
 
-   - **プロジェクト別**: プロジェクトごとの作業時間を表示
-   - **カテゴリ別**: カテゴリごとの作業時間を表示
+**2. View Toggle**
 
-3. **印刷**
-   - 「印刷」ボタンをクリック
-   - A4 縦サイズで印刷プレビューが表示されます
+- **Project View**: Aggregated hours by project
+- **Category View**: Aggregated hours by category
+- Switch between views with single click
 
-## 🗄️ データベース構造
+**3. Report Export**
 
-### ERD（Entity Relationship Diagram）
+- Click "Print" button for print preview
+- A4 portrait layout with professional formatting
+- Save as PDF or print directly
+
+---
+
+## DATABASE SCHEMA
+
+### ENTITY RELATIONSHIP DIAGRAM
 
 ```mermaid
 erDiagram
@@ -351,7 +395,7 @@ erDiagram
     }
 ```
 
-### カテゴリマスタ
+### CATEGORY DISTRIBUTION
 
 ```mermaid
 pie title カテゴリ分類
@@ -362,21 +406,23 @@ pie title カテゴリ分類
     "その他" : 5
 ```
 
-### Task テーブル詳細
+### TASK TABLE SPECIFICATION
 
-| カラム名         | 型           | NULL | 説明                 |
-| ---------------- | ------------ | ---- | -------------------- |
-| id               | INTEGER      | NO   | 主キー（自動採番）   |
-| task_name        | VARCHAR(100) | NO   | プロジェクト名       |
-| category         | VARCHAR(50)  | NO   | カテゴリ             |
-| memo             | VARCHAR(500) | YES  | メモ                 |
-| created_date     | DATE         | NO   | 作成日               |
-| start_time       | DATETIME     | YES  | 開始時刻             |
-| end_time         | DATETIME     | YES  | 終了時刻             |
-| duration_seconds | INTEGER      | YES  | 作業時間（秒単位）   |
-| is_running       | BOOLEAN      | NO   | タイマー実行中フラグ |
+| Column           | Type         | Nullable | Description                  |
+| ---------------- | ------------ | -------- | ---------------------------- |
+| id               | INTEGER      | NO       | Primary key (auto-increment) |
+| task_name        | VARCHAR(100) | NO       | Project identifier           |
+| category         | VARCHAR(50)  | NO       | Task category                |
+| memo             | VARCHAR(500) | YES      | Optional notes               |
+| created_date     | DATE         | NO       | Creation timestamp           |
+| start_time       | DATETIME     | YES      | Timer start timestamp        |
+| end_time         | DATETIME     | YES      | Timer end timestamp          |
+| duration_seconds | INTEGER      | YES      | Total duration in seconds    |
+| is_running       | BOOLEAN      | NO       | Timer active flag            |
 
-## 🔧 技術スタック
+---
+
+## TECHNOLOGY STACK
 
 ```mermaid
 graph LR
@@ -411,20 +457,23 @@ graph LR
     style H fill:#81c784
 ```
 
-### 使用技術一覧
+### STACK COMPONENTS
 
-| カテゴリ           | 技術                    | バージョン |
-| ------------------ | ----------------------- | ---------- |
-| 言語               | Python                  | 3.8+       |
-| Web フレームワーク | Flask                   | 3.1.2      |
-| ORM                | SQLAlchemy              | 2.0+       |
-| データベース       | SQLite / PostgreSQL     | -          |
-| フロントエンド     | HTML5, CSS3, JavaScript | -          |
-| その他             | psycopg2-binary         | 2.9+       |
+| Layer                  | Technology                   | Version |
+| ---------------------- | ---------------------------- | ------- |
+| **Language**           | Python                       | 3.8+    |
+| **Web Framework**      | Flask                        | 3.1.2   |
+| **ORM**                | SQLAlchemy                   | 2.0+    |
+| **Database**           | SQLite / PostgreSQL          | 12+     |
+| **Frontend**           | HTML5, CSS3, JavaScript ES6+ | -       |
+| **Database Driver**    | psycopg2-binary              | 2.9+    |
+| **Session Management** | Flask-SQLAlchemy             | 3.1+    |
 
-## 🎨 デザイン特徴
+---
 
-### カラーパレット
+## DESIGN SYSTEM
+
+### COLOR PALETTE
 
 ```mermaid
 graph LR
@@ -441,14 +490,18 @@ graph LR
     style E fill:#6C757D,color:#fff
 ```
 
-- **モダンなグラデーション**: 紫系のグラデーション背景
-- **レスポンシブデザイン**: モバイル・タブレット・デスクトップに対応
-- **カテゴリカラー**: カテゴリごとに色分け
-- **印刷最適化**: A4 縦サイズで綺麗に印刷可能
+**Design Principles:**
 
-## 🐛 トラブルシューティング
+- **Modern Gradient System**: Purple-based gradient backgrounds for visual hierarchy
+- **Fully Responsive**: Optimized layouts for mobile, tablet, and desktop viewports
+- **Category Color Coding**: Distinct color scheme for instant category recognition
+- **Print Optimization**: Professional A4 portrait layout with high-contrast printing
 
-### よくある問題と解決方法
+---
+
+## TROUBLESHOOTING
+
+### COMMON ISSUES & SOLUTIONS
 
 ```mermaid
 graph TD
@@ -470,39 +523,45 @@ graph TD
     style F fill:#c8e6c9
 ```
 
-### Flask が起動しない
+**Issue: Flask fails to start**
 
 ```bash
-# 仮想環境を再作成
+# Rebuild virtual environment
 rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### データベースをリセットしたい
+**Issue: Database corruption or reset needed**
 
 ```bash
+# Remove existing database
 rm -f instance/db.sqlite
-python3 app.py  # 再起動時に自動作成
+python3 app.py  # Auto-recreates on startup
 ```
 
-### ポート 5000 が使用中
+**Issue: Port 5000 already in use**
 
 ```python
-# app.py の最後の行を変更
+# Edit app.py - change port number
 app.run(debug=True, port=5001)
 ```
 
-## 📊 開発情報
+---
 
-### 開発体制
+## DEVELOPMENT
 
-- **対象者**: IT 専門学生 6 名
-- **開発期間**: 9 時間（1 日）
-- **合計工数**: 54 人時間
+### PROJECT METRICS
 
-### 開発の流れ
+```
+Team Size:     6 developers
+Timeline:      9 hours (single day sprint)
+Total Effort:  54 person-hours
+Methodology:   Agile development with rapid prototyping
+```
+
+### DEVELOPMENT TIMELINE
 
 ```mermaid
 gantt
@@ -523,25 +582,38 @@ gantt
     動作確認        :done, 17:00, 1h
 ```
 
-## 📄 ライセンス
+---
 
-このプロジェクトは教育目的で作成されています。
+## LICENSE
 
-## 🤝 コントリビューション
+This project is created for educational purposes.
 
-バグ報告や機能リクエストは、GitHub の Issues でお願いします。
+## CONTRIBUTING
 
-## 📞 サポート
+Bug reports and feature requests are welcome via GitHub Issues.
 
-問題が発生した場合は、以下を確認してください：
+## SUPPORT
 
-1. [トラブルシューティング](#トラブルシューティング)
-2. GitHub Issues
-3. 開発チームへの連絡
+For assistance, please refer to:
+
+1. [Troubleshooting Guide](#troubleshooting)
+2. [GitHub Issues](https://github.com/itc-s24011/ItColTaskReportMonthly/issues)
+3. Development team contact
 
 ---
 
-**作成日**: 2025 年 12 月 15 日  
-**最終更新**: 2026 年 1 月 19 日  
-**バージョン**: 1.1.0  
-**開発**: IT 専門学生 6 名による共同開発プロジェクト
+<div align="center">
+
+### PROJECT INFORMATION
+
+**Created:** December 15, 2025  
+**Last Updated:** January 19, 2026  
+**Version:** 1.1.0
+
+**Development Team:** IT Professional Students (6 members)
+
+---
+
+_Built with precision. Designed for professionals._
+
+</div>

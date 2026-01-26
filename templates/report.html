@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月次レポート</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <h1>📊 Monthly Report</h1>
+            <nav class="nav-tabs">
+                <a href="{{ url_for('home') }}" class="nav-tab">タスク登録</a>
+                <a href="{{ url_for('report') }}" class="nav-tab active">月次レポート</a>
+            </nav>
+        </header>
+
+        <!-- 月次選択 -->
+        <div class="report-controls no-print">
+            <form method="GET" action="{{ url_for('report') }}" class="month-selector">
+                <div class="form-group-inline">
+                    <label for="year">年:</label>
+                    <select id="year" name="year" onchange="this.form.submit()">
+                        {% for option in month_options %}
+                            <option value="{{ option.year }}" {% if option.year == year %}selected{% endif %}>
+                                {{ option.year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group-inline">
+                    <label for="month">月:</label>
+                    <select id="month" name="month" onchange="this.form.submit()">
+                        {% for i in range(1, 13) %}
+                            <option value="{{ i }}" {% if i == month %}selected{% endif %}>
+                                {{ i }}月
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <input type="hidden" name="view" value="{{ view_type }}">
+            </form>
+            
+            <!-- 表示切替 -->
+            <div class="view-toggle">
+                <a href="{{ url_for('report', year=year, month=month, view='project') }}" 
+                   class="toggle-btn {% if view_type == 'project' %}active{% endif %}">
+                    プロジェクト別
+                </a>
+                <a href="{{ url_for('report', year=year, month=month, view='category') }}" 
+                   class="toggle-btn {% if view_type == 'category' %}active{% endif %}">
+                    カテゴリ別
+                </a>
+            </div>
+            
+            <button onclick="window.print()" class="btn btn-primary">🖨️ 印刷</button>
+        </div>
+
+        <!-- サマリー表示 -->
+        <div class="report-summary">
+            <h2>{{ year }}年{{ month }}月の集計</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-icon">📅</div>
+                    <div class="card-content">
+                        <div class="card-label">総作業日数</div>
+                        <div class="card-value">{{ total_days }} <span class="unit">日</span></div>
+                    </div>
+                </div>
+                
+                <div class="summary-card">
+                    <div class="card-icon">⏱️</div>
+                    <div class="card-content">
+                        <div class="card-label">総作業時間</div>
+                        <div class="card-value">{{ total_hours }} <span class="unit">時間</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 集計テーブル -->
+        <div class="report-table-container">
+            <h3>
+                {% if view_type == 'category' %}
+                    カテゴリ別集計
+                {% else %}
+                    プロジェクト別集計
+                {% endif %}
+            </h3>
+            
+            {% if summary_list %}
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th class="col-name">
+                                {% if view_type == 'category' %}カテゴリ名{% else %}プロジェクト名{% endif %}
+                            </th>
+                            <th class="col-hours">作業時間</th>
+                            <th class="col-percentage">割合</th>
+                            <th class="col-graph no-print">グラフ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in summary_list %}
+                        <tr>
+                            <td class="col-name">{{ item.name }}</td>
+                            <td class="col-hours">{{ item.hours }}h</td>
+                            <td class="col-percentage">{{ item.percentage }}%</td>
+                            <td class="col-graph no-print">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ item.percentage }}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td class="col-name"><strong>合計</strong></td>
+                            <td class="col-hours"><strong>{{ total_hours }}h</strong></td>
+                            <td class="col-percentage"><strong>100%</strong></td>
+                            <td class="col-graph no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    <p>📭 この期間のデータはありません</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 印刷用フッター -->
+        <div class="print-only print-footer">
+            <p>作成日: {{ today }}</p>
+            <p>月次作業報告書 - {{ year }}年{{ month }}月</p>
+        </div>
+    </div>
+
+    <script>
+        // 年月の重複を除去
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSelect = document.getElementById('year');
+            const uniqueYears = new Set();
+            const options = Array.from(yearSelect.options);
+            
+            options.forEach(option => {
+                if (uniqueYears.has(option.value)) {
+                    option.remove();
+                } else {
+                    uniqueYears.add(option.value);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

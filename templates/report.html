@@ -10,7 +10,7 @@
     <div class="container">
         <!-- ヘッダー -->
         <header class="app-header">
-            <h1>📊 Monthly Report</h1>
+            <h1>Monthly Report</h1>
             <nav class="nav-tabs">
                 <a href="{{ url_for('home') }}" class="nav-tab">タスク登録</a>
                 <a href="{{ url_for('report') }}" class="nav-tab active">月次レポート</a>
@@ -57,7 +57,7 @@
                 </a>
             </div>
             
-            <button onclick="window.print()" class="btn btn-primary">🖨️ 印刷</button>
+            <button onclick="window.print()" class="btn btn-primary">印刷</button>
         </div>
 
         <!-- サマリー表示 -->
@@ -65,7 +65,7 @@
             <h2>{{ year }}年{{ month }}月の集計</h2>
             <div class="summary-cards">
                 <div class="summary-card">
-                    <div class="card-icon">📅</div>
+                    <div class="card-icon">Days</div>
                     <div class="card-content">
                         <div class="card-label">総作業日数</div>
                         <div class="card-value">{{ total_days }} <span class="unit">日</span></div>
@@ -73,7 +73,7 @@
                 </div>
                 
                 <div class="summary-card">
-                    <div class="card-icon">⏱️</div>
+                    <div class="card-icon">Hours</div>
                     <div class="card-content">
                         <div class="card-label">総作業時間</div>
                         <div class="card-value">{{ total_hours }} <span class="unit">時間</span></div>
@@ -129,7 +129,7 @@
                 </table>
             {% else %}
                 <div class="no-data">
-                    <p>📭 この期間のデータはありません</p>
+                    <p>この期間のデータはありません</p>
                 </div>
             {% endif %}
         </div>

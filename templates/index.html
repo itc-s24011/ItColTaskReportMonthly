@@ -111,11 +111,11 @@
                     
                     <div class="task-actions" role="group" aria-label="タスク操作">
                         {% if task.is_running %}
-                            <form method="POST" action="{{ url_for('stop_timer', task_id=task.id) }}" style="display: inline;">
+                            <form method="POST" action="{{ url_for('stop_timer', task_id=task.id) }}" class="scroll-preserve" style="display: inline;">
                                 <button type="submit" class="btn btn-stop" aria-label="タイマーを停止">STOP</button>
                             </form>
                         {% else %}
-                            <form method="POST" action="{{ url_for('start_timer', task_id=task.id) }}" style="display: inline;">
+                            <form method="POST" action="{{ url_for('start_timer', task_id=task.id) }}" class="scroll-preserve" style="display: inline;">
                                 <button type="submit" class="btn btn-start" aria-label="タイマーを開始">START</button>
                             </form>
                         {% endif %}
@@ -182,6 +182,22 @@
     <script>
         // タイマーのリアルタイム更新
         let updateTimerInterval = null;
+
+        // START/STOP押下時にスクロール位置を保存して復元
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollForms = document.querySelectorAll('.scroll-preserve');
+            scrollForms.forEach(form => {
+                form.addEventListener('submit', () => {
+                    localStorage.setItem('scrollRestoreY', String(window.scrollY));
+                });
+            });
+
+            const savedY = localStorage.getItem('scrollRestoreY');
+            if (savedY !== null) {
+                window.scrollTo(0, Number(savedY));
+                localStorage.removeItem('scrollRestoreY');
+            }
+        });
 
         function updateTimer() {
             fetch('/api/timer_status')

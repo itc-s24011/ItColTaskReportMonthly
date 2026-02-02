@@ -73,10 +73,10 @@
                 </div>
                 
                 <div class="summary-card">
-                    <div class="card-icon">Hours</div>
+                    <div class="card-icon">Time</div>
                     <div class="card-content">
                         <div class="card-label">総作業時間</div>
-                        <div class="card-value">{{ total_hours }} <span class="unit">時間</span></div>
+                        <div class="card-value">{{ (total_seconds // 3600)|int }}:{{ '%02d' % ((total_seconds % 3600) // 60) }}:{{ '%02d' % (total_seconds % 60) }}</div>
                     </div>
                 </div>
             </div>
@@ -92,6 +92,17 @@
                 {% endif %}
             </h3>
             
+            <!-- 集計内容表示 -->
+            <div class="aggregation-info">
+                <p>集計対象: 
+                    {% if view_type == 'category' %}
+                        <strong>カテゴリ別</strong>
+                    {% else %}
+                        <strong>プロジェクト別</strong>
+                    {% endif %}
+                </p>
+            </div>
+            
             {% if summary_list %}
                 <table class="report-table">
                     <thead>
@@ -99,6 +110,7 @@
                             <th class="col-name">
                                 {% if view_type == 'category' %}カテゴリ名{% else %}プロジェクト名{% endif %}
                             </th>
+                            <th class="col-category">カテゴリ</th>
                             <th class="col-hours">作業時間</th>
                             <th class="col-percentage">割合</th>
                             <th class="col-graph no-print">グラフ</th>
@@ -108,7 +120,14 @@
                         {% for item in summary_list %}
                         <tr>
                             <td class="col-name">{{ item.name }}</td>
-                            <td class="col-hours">{{ item.hours }}h</td>
+                            <td class="col-category">
+                                {% if view_type == 'project' and item.category %}
+                                    <span class="task-category category-{{ item.category }}">{{ item.category }}</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td class="col-hours">{{ (item.seconds // 3600)|int }}:{{ '%02d' % ((item.seconds % 3600) // 60) }}:{{ '%02d' % (item.seconds % 60) }}</td>
                             <td class="col-percentage">{{ item.percentage }}%</td>
                             <td class="col-graph no-print">
                                 <div class="progress-bar">
@@ -121,7 +140,8 @@
                     <tfoot>
                         <tr class="total-row">
                             <td class="col-name"><strong>合計</strong></td>
-                            <td class="col-hours"><strong>{{ total_hours }}h</strong></td>
+                            <td class="col-category">—</td>
+                            <td class="col-hours"><strong>{{ (total_seconds // 3600)|int }}:{{ '%02d' % ((total_seconds % 3600) // 60) }}:{{ '%02d' % (total_seconds % 60) }}</strong></td>
                             <td class="col-percentage"><strong>100%</strong></td>
                             <td class="col-graph no-print"></td>
                         </tr>

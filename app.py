@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
@@ -6,6 +6,7 @@ import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your-secret-key-change-this'
 
 # 環境変数でデータベースを切り替え可能
 # デフォルトはSQLite、USE_POSTGRESQL=1でPostgreSQLを使用
@@ -23,7 +24,7 @@ class Task(db.Model):
     __tablename__ = 'tasks'
     
     id = db.Column(db.Integer, primary_key=True)
-    task_name = db.Column(db.String(100), nullable=False)  # プロジェクト名
+    task_name = db.Column(db.String(100), nullable=False, unique=True)  # プロジェクト名（ユニーク）
     category = db.Column(db.String(50), nullable=False)  # カテゴリ（開発、会議、メール、調査、その他）
     memo = db.Column(db.String(500))  # メモ
     created_date = db.Column(db.Date, nullable=False, default=datetime.now().date)  # 作成日
@@ -74,14 +75,21 @@ def add_task():
     memo = request.form.get("memo", "")
     
     if task_name and category:
-        new_task = Task(
-            task_name=task_name,
-            category=category,
-            memo=memo,
-            created_date=datetime.now().date()
-        )
-        db.session.add(new_task)
-        db.session.commit()
+        # 既に同じプロジェクト名が存在するかチェック
+        existing_task = Task.query.filter_by(task_name=task_name).first()
+        if existing_task:
+            # 重複時はエラーメッセージを表示
+            flash("すでにあるプロジェクト名です", "error")
+        else:
+            new_task = Task(
+                task_name=task_name,
+                category=category,
+                memo=memo,
+                created_date=datetime.now().date()
+            )
+            db.session.add(new_task)
+            db.session.commit()
+            flash("タスクを追加しました", "success")
     
     return redirect(url_for("home"))
 
@@ -169,9 +177,8 @@ def report():
         Task.created_date < end_date
     ).all()
     
-    # 総作業時間（時間単位）
+    # 総作業時間（秒単位）
     total_seconds = sum(task.duration_seconds for task in tasks)
-    total_hours = round(total_seconds / 3600, 1)
     
     # 総作業日数（ユニークな日付の数）
     unique_dates = set(task.created_date for task in tasks)
@@ -188,28 +195,33 @@ def report():
             Task.created_date < end_date
         ).group_by(Task.category).all()
     else:
-        # プロジェクト別集計
+        # プロジェクト別集計（カテゴリ情報も取得）
         aggregation = db.session.query(
             Task.task_name.label('name'),
+            Task.category.label('category'),
             func.sum(Task.duration_seconds).label('total_seconds')
         ).filter(
             Task.created_date >= start_date,
             Task.created_date < end_date
-        ).group_by(Task.task_name).all()
+        ).group_by(Task.task_name, Task.category).all()
     
     # 集計結果を整形（作業時間の降順）
     summary_list = []
     for item in aggregation:
-        hours = round(item.total_seconds / 3600, 1)
+        seconds = int(item.total_seconds)
         percentage = round((item.total_seconds / total_seconds * 100), 1) if total_seconds > 0 else 0
-        summary_list.append({
+        summary_item = {
             'name': item.name,
-            'hours': hours,
+            'seconds': seconds,
             'percentage': percentage
-        })
+        }
+        # プロジェクト別集計時はカテゴリ情報を追加
+        if view_type == 'project' and hasattr(item, 'category'):
+            summary_item['category'] = item.category
+        summary_list.append(summary_item)
     
     # 作業時間で降順ソート
-    summary_list.sort(key=lambda x: x['hours'], reverse=True)
+    summary_list.sort(key=lambda x: x['seconds'], reverse=True)
     
     # 年月の選択肢を生成（過去12ヶ月）
     month_options = []
@@ -225,10 +237,11 @@ def report():
                          year=year,
                          month=month,
                          view_type=view_type,
-                         total_hours=total_hours,
+                         total_seconds=total_seconds,
                          total_days=total_days,
                          summary_list=summary_list,
-                         month_options=month_options)
+                         month_options=month_options,
+                         today=datetime.now().strftime('%Y年%m月%d日'))
 
 
 # API: 実行中のタスクの経過時間を取得

@@ -169,9 +169,8 @@ def report():
         Task.created_date < end_date
     ).all()
     
-    # 総作業時間（時間単位）
+    # 総作業時間（秒単位）
     total_seconds = sum(task.duration_seconds for task in tasks)
-    total_hours = round(total_seconds / 3600, 1)
     
     # 総作業日数（ユニークな日付の数）
     unique_dates = set(task.created_date for task in tasks)
@@ -200,16 +199,16 @@ def report():
     # 集計結果を整形（作業時間の降順）
     summary_list = []
     for item in aggregation:
-        hours = round(item.total_seconds / 3600, 1)
+        seconds = int(item.total_seconds)
         percentage = round((item.total_seconds / total_seconds * 100), 1) if total_seconds > 0 else 0
         summary_list.append({
             'name': item.name,
-            'hours': hours,
+            'seconds': seconds,
             'percentage': percentage
         })
     
     # 作業時間で降順ソート
-    summary_list.sort(key=lambda x: x['hours'], reverse=True)
+    summary_list.sort(key=lambda x: x['seconds'], reverse=True)
     
     # 年月の選択肢を生成（過去12ヶ月）
     month_options = []
@@ -225,10 +224,11 @@ def report():
                          year=year,
                          month=month,
                          view_type=view_type,
-                         total_hours=total_hours,
+                         total_seconds=total_seconds,
                          total_days=total_days,
                          summary_list=summary_list,
-                         month_options=month_options)
+                         month_options=month_options,
+                         today=datetime.now().strftime('%Y年%m月%d日'))
 
 
 # API: 実行中のタスクの経過時間を取得

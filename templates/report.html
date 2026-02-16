@@ -46,18 +46,6 @@
                 <input type="hidden" name="view" value="{{ view_type }}">
             </form>
             
-            <!-- 表示切替 -->
-            <div class="view-toggle">
-                <a href="{{ url_for('report', year=year, month=month, view='project') }}" 
-                   class="toggle-btn {% if view_type == 'project' %}active{% endif %}">
-                    プロジェクト別
-                </a>
-                <a href="{{ url_for('report', year=year, month=month, view='category') }}" 
-                   class="toggle-btn {% if view_type == 'category' %}active{% endif %}">
-                    カテゴリ別
-                </a>
-            </div>
-            
             <button onclick="window.print()" class="btn btn-primary">印刷</button>
         </div>
 
